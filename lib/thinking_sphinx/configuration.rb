@@ -66,7 +66,7 @@ module ThinkingSphinx
     attr_accessor :searchd_file_path, :allow_star, :app_root,
       :model_directories, :delayed_job_priority, :indexed_models, :use_64_bit,
       :touched_reindex_file, :stop_timeout, :version, :shuffle,
-      :hard_retry_count
+      :hard_retry_count, :slave
 
     attr_accessor :source_options, :index_options
 

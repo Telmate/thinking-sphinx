@@ -54,7 +54,7 @@ module ThinkingSphinx
       )
       source.parent = "#{index.core_name}_#{position}"
 
-      set_source_database_settings  source
+      set_source_database_settings  source, {:use_slave => true}
       set_source_fields             source
       set_source_attributes         source, offset, true
       set_source_settings           source
@@ -83,7 +83,7 @@ module ThinkingSphinx
       attributes.select { |attrib| attrib.available? }
     end
 
-    def set_source_database_settings(source)
+    def set_source_database_settings(source, options={})
       config = @database_configuration
 
       source.sql_host = config[:host]           || "localhost"
@@ -92,6 +92,16 @@ module ThinkingSphinx
       source.sql_db   = config[:database]
       source.sql_port = config[:port]
       source.sql_sock = config[:socket]
+
+      if options[:use_slave]
+        slave_info = ThinkingSphinx::Configuration.instance.slave
+        source.sql_host = slave_info["host"] || source.sql_host
+        source.sql_user = slave_info["user"] || source.sql_user
+        source.sql_pass = slave_info["pass"] || source.sql_pass
+        source.sql_db   = slave_info["db"] || source.sql_db
+        source.sql_port = slave_info["port"] || source.sql_port
+        source.sql_sock = slave_info["socket"] || source.sql_sock
+      end
 
       # MySQL SSL support
       source.mysql_ssl_ca   = config[:sslca]   if config[:sslca]
@@ -124,8 +134,10 @@ module ThinkingSphinx
         source.sql_query_pre << "SET SESSION group_concat_max_len = #{@index.local_options[:group_concat_max_len]}"
       end
 
-      source.sql_query_pre += [adapter.utf8_query_pre].compact if utf8?
-      source.sql_query_pre << adapter.utc_query_pre
+      if !delta
+        source.sql_query_pre += [adapter.utf8_query_pre].compact if utf8?
+        source.sql_query_pre << adapter.utc_query_pre
+      end
     end
 
     def set_source_settings(source)
