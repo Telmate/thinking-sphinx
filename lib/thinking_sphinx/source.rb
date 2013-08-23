@@ -134,10 +134,8 @@ module ThinkingSphinx
         source.sql_query_pre << "SET SESSION group_concat_max_len = #{@index.local_options[:group_concat_max_len]}"
       end
 
-      if !delta
-        source.sql_query_pre += [adapter.utf8_query_pre].compact if utf8?
-        source.sql_query_pre << adapter.utc_query_pre
-      end
+      source.sql_query_pre += [adapter.utf8_query_pre].compact if utf8?
+      source.sql_query_pre << adapter.utc_query_pre
     end
 
     def set_source_settings(source)
