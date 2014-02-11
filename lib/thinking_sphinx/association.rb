@@ -137,15 +137,16 @@ module ThinkingSphinx
     # have a lot of data.
     # 
     def self.polymorphic_classes(ref)
-      ref.active_record.connection.select_all(
-        "SELECT DISTINCT #{foreign_type(ref)} " +
-        "FROM #{ref.active_record.table_name} " +
-        "WHERE #{foreign_type(ref)} IS NOT NULL"
-      ).collect { |row|
-        row[foreign_type(ref)].constantize
-      }
-    end
+      association_types = ref.active_record.sphinx_association_types.presence ||
+        ref.active_record.connection.select_all(
+          "SELECT DISTINCT #{foreign_type(ref)} " +
+          "FROM #{ref.active_record.table_name} " +
+          "WHERE #{foreign_type(ref)} IS NOT NULL"
+        ).collect { |row| row[foreign_type(ref)] }
     
+      association_types.collect { |item| item.constantize }
+    end
+   
     # Returns a new set of options for an association that mimics an existing
     # polymorphic relationship for a specific class. It adds a condition to
     # filter by the appropriate object.

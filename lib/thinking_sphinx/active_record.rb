@@ -24,7 +24,7 @@ module ThinkingSphinx
         extend ThinkingSphinx::ActiveRecord::ClassMethods
 
         class << self
-          attr_accessor :sphinx_index_blocks, :sphinx_types
+          attr_accessor :sphinx_index_blocks, :sphinx_types, :sphinx_association_types
 
           def set_sphinx_primary_key(attribute)
             @sphinx_primary_key_attribute = attribute
@@ -58,6 +58,10 @@ module ThinkingSphinx
 
           def set_sphinx_types(types)
             @sphinx_types = types
+          end
+
+          def set_sphinx_association_types(types)
+            @sphinx_association_types = types
           end
 
           # Generate a unique CRC value for the model's name, to use to
